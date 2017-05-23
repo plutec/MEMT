@@ -1,4 +1,11 @@
 #######################
+## Compiled binaries
+#######################
+
+anal/malAnalSvc
+cat/categorizer
+
+#######################
 ## Project section
 #######################
 
