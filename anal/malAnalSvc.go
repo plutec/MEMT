@@ -33,9 +33,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/securityartwork/anal/hashing"
-	"github.com/securityartwork/cat/binanal"
-	"github.com/securityartwork/cat/image"
+	"github.com/plutec/memt/anal/hashing"
+	"github.com/plutec/memt/cat/binanal"
+	"github.com/plutec/memt/cat/image"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

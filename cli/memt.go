@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/securityartwork/cli/api"
+	"github.com/plutec/memt/cli/api"
 )
 
 var usage = `

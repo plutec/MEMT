@@ -13,9 +13,9 @@ import (
 	"strings"
 
 	"github.com/dutchcoders/gossdeep"
-	"github.com/securityartwork/cat/binanal"
-	"github.com/securityartwork/cat/image"
-	// "github.com/securityartwork/cat/hashing"
+	"github.com/plutec/memt/cat/binanal"
+	"github.com/plutec/memt/cat/image"
+	// "github.com/securityartwork/memt/cat/hashing"
 )
 
 var thresholdFlag int

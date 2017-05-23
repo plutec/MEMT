@@ -6,7 +6,7 @@ import (
 	"image/png"
 	"math"
 
-	"github.com/securityartwork/cat/binanal"
+	"github.com/plutec/memt/cat/binanal"
 )
 
 // Encodes data to monochromatic-color-scale PNG file
