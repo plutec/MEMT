@@ -40,8 +40,8 @@ def main():
         db = client[DB_NAME]
         for obj in data:
             obj["date"] = datetime.utcnow()
-            obj['imagedir'] = '.'.join(obj['imagedir'].split('.')[:-1]) #TODO Pending of issue #3
-            obj['artifactdir'] = obj['artifactdir']
+            obj['imageDir'] = '.'.join(obj['imageDir'].split('.')[:-1]) #TODO Pending of issue #3
+            #obj['artifactdir'] = obj['artifactDir']
             if not obj['symbols']:
                 obj['symbols'] = []
             if not obj['imports']:
