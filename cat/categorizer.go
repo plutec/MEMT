@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"runtime"
 
 	"github.com/dutchcoders/gossdeep"
 	"github.com/plutec/memt/cat/binanal"
@@ -84,7 +85,7 @@ func catalog() {
 		checkErr(err)
 
 		element.Ssdeep = hash
-		element.Sha256 = fileName
+		element.Sha256 = fileName //TODO, We suppose that the name is the sha256 and it's not right
 		element.ArtifactDir = path.Join(dirFlag, fileName)
 		element.ImageDir = fmt.Sprintf("%s.png", path.Join(imgoutFlag, fileName))
 		artifactArray = append(artifactArray, element)
@@ -102,25 +103,26 @@ func catalog() {
 
 		if sectionData, libraries, symbols, err := binanal.PEAnal(fileDir); err == nil {
 			// Check and extract data if PE
-			err := setArtifactData(&artifactArray[i], "pe", symbols, libraries)
+			err := setArtifactData(&binaryArray, &artifactArray[i], "pe", symbols, libraries)
 			checkErr(err)
 			generateColorImage(fullImageDir, binaryArray, sectionData)
 		} else if sectionData, libraries, symbols, err := binanal.ELFAnal(fileDir); err == nil {
 			// Check and extract data if ELF
-			err := setArtifactData(&artifactArray[i], "elf", symbols, libraries)
+			err := setArtifactData(&binaryArray, &artifactArray[i], "elf", symbols, libraries)
 			checkErr(err)
 			generateColorImage(fullImageDir, binaryArray, sectionData)
 		} else if sectionData, libraries, symbols, err := binanal.MACHOAnal(fileDir); err == nil {
 			// Check and extract data if Mach-O
-			err := setArtifactData(&artifactArray[i], "macho", symbols, libraries)
+			err := setArtifactData(&binaryArray, &artifactArray[i], "macho", symbols, libraries)
 			checkErr(err)
 			generateColorImage(fullImageDir, binaryArray, sectionData)
 		} else {
 			// Not a PE, ELF nor MACH-O
-			err := setArtifactData(&artifactArray[i], "unknown", nil, nil)
+			err := setArtifactData(&binaryArray, &artifactArray[i], "unknown", nil, nil)
 			checkErr(err)
 			generateImage(fullImageDir, binaryArray)
 		}
+		runtime.GC()
 	}
 
 	// Genetic selector
@@ -166,40 +168,45 @@ func catalog() {
 
 	// Prints the formatted JSON
 	fmt.Println("[")
+	length := len(artifactArray) - 1
 	for k := range artifactArray {
 		jsonBytes, _ := json.MarshalIndent(artifactArray[k], "", "\t")
-		fmt.Println(string(jsonBytes) + ",")
+		if k < length {
+			fmt.Println(string(jsonBytes) + ",")
+		} else {
+			fmt.Println(string(jsonBytes))
+		}
 	}
 	fmt.Println("]")
 }
 
 // Sets the artifact fields
-func setArtifactData(artifact *Artifact, format string, symbols, libraries []string) error {
+func setArtifactData(raw *[]byte, artifact *Artifact, format string, symbols, libraries []string) error {
 	// Format fields
 	artifact.Format = format
 	artifact.Symbols = symbols
 	artifact.Imports = libraries
 
 	// Read file for hashing
-	fName := artifact.ArtifactDir
+	/*fName := artifact.ArtifactDir
 	file, err := ioutil.ReadFile(fName)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	// Copies file to md5 hash array
 	md5hasher := md5.New()
-	md5hasher.Write(file)
+	md5hasher.Write(*raw)
 	md5hash := md5hasher.Sum(nil)
 
 	// Copies file to sha1 hash array
 	sha1hasher := sha1.New()
-	sha1hasher.Write(file)
+	sha1hasher.Write(*raw)
 	sha1hash := sha1hasher.Sum(nil)
 
 	// Copies file to sha512 hash array
 	sha512hasher := sha512.New()
-	sha512hasher.Write(file)
+	sha512hasher.Write(*raw)
 	sha512hash := sha512hasher.Sum(nil)
 
 	artifact.Md5 = fmt.Sprintf("%x", md5hash)
