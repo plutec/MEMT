@@ -20,7 +20,7 @@ import (
 )
 
 var thresholdFlag int
-var dirFlag, imgoutFlag string
+var dirFlag, imgoutFlag, reportoutFlag string
 var verboseFlag bool
 
 type Artifact struct {
@@ -44,6 +44,7 @@ func init() {
 	flag.BoolVar(&verboseFlag, "verbose", false, "Goes verbose.")
 	flag.StringVar(&dirFlag, "dir", "./", "Dir to scan.")
 	flag.StringVar(&imgoutFlag, "imgout", "/tmp", "Output directory of generated pictures.")
+	flag.StringVar(&reportoutFlag, "reportout", "report.json", "Output file of generated report.")
 	flag.IntVar(&thresholdFlag, "threshold", 1, "Sets threshold to compare")
 }
 
@@ -166,7 +167,32 @@ func catalog() {
 		artifactArray[i].Mutations = mutsOfStrain
 	}
 
-	// Prints the formatted JSON
+	dbgPrint("Writing report.")
+	// Dumps formatted JSON
+	fd, err := os.Create(reportoutFlag)
+    checkErr(err)
+
+
+    _, err = fd.WriteString("[")
+    checkErr(err)
+	length := len(artifactArray) - 1
+	for k := range artifactArray {
+		jsonBytes, _ := json.MarshalIndent(artifactArray[k], "", "\t")
+		if k < length {
+			//fmt.Println(string(jsonBytes) + ",")
+			_, err := fd.WriteString(string(jsonBytes) + ",")
+			checkErr(err)
+		} else {
+			//fmt.Println(string(jsonBytes))
+			_, err := fd.WriteString(string(jsonBytes))
+			checkErr(err)
+		}
+	}
+	_, err = fd.WriteString("]")
+			checkErr(err)
+	
+    fd.Close()
+    /*
 	fmt.Println("[")
 	length := len(artifactArray) - 1
 	for k := range artifactArray {
@@ -178,6 +204,7 @@ func catalog() {
 		}
 	}
 	fmt.Println("]")
+	*/
 }
 
 // Sets the artifact fields
